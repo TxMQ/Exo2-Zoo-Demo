@@ -17,12 +17,7 @@ Exo implements the following feature set:
 - An event-driven framework for invoking processing logic on transactions at each step in the transaction life cycle
 - A framework for logging processed transactions to a blockchain-based transaction log (blockchain the data structure, not blockchain the platform)
 
-Before You Begin
-----------------
+### More Information
+There's more to learn about building Exo applications.  First, check out the (Exo Demo Application)[https://github.com/craigdrabiktxmq/exo2-demo] and see how the demo is put together.  It illustrates all of the concepts currently supported by Exo, and is dockerized so you can easily run the application stack.
 
-Start by reading the [How a Swirld Works](SwirldsApplications.md) and [Exo Application Architecture](ApplicationArchitecture.md) documentation.  These two documents will give you a foundation in how a Swirlds application works, the challenges you'll encounter when developing on the Alpha SDK, and how Exo helps you overcome those challenges.
-
-Pardon Our Dust
----------------
-
-We're still working through the documentation for Exo 2.  JSON configuration and transaction logging are holdovers from version 1 of the framework, and there have been some changes.
+When you're ready to dive into development, check the [docs folder](docs/README.md) for additional README files that describe how to use each feature in more detail.
