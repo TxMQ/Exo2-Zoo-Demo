@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.txmq.exo.messaging.AviatorTransactionType;
 import com.txmq.exo.messaging.ExoMessage;
 
 public class ExoMessageJsonParser extends ObjectMapper {
@@ -28,14 +29,14 @@ public class ExoMessageJsonParser extends ObjectMapper {
 	 * logged to a text file such as in the file-based, in-progress backup to the 
 	 * block logger.
 	 */
-	private static Map<Integer, Class<?>> payloadMap;
+	private static Map<AviatorTransactionType, Class<?>> payloadMap;
 	
-	public static void registerPayloadType(Integer transactionTypeValue, Class<?> payloadClass) {
+	public static void registerPayloadType(AviatorTransactionType transactionType, Class<?> payloadClass) {
 		if (payloadMap == null) {
-			payloadMap = Collections.synchronizedMap(new HashMap<Integer, Class<?>>());
+			payloadMap = Collections.synchronizedMap(new HashMap<AviatorTransactionType, Class<?>>());
 		}
 		
-		payloadMap.put(transactionTypeValue, payloadClass);
+		payloadMap.put(transactionType, payloadClass);
 	}
 	
 	public ExoMessageJsonParser() {
@@ -73,8 +74,10 @@ public class ExoMessageJsonParser extends ObjectMapper {
 		    	Entry<String, JsonNode> element = elementsIterator.next();  
 		    	String name = element.getKey();
 		    	if (name.equals("transactionType")) {
-		    		Integer transType = Integer.valueOf(element.getValue().get("value").intValue());
-		    		clazz = payloadMap.get(transType); 
+		    		Integer transTypeValue = Integer.valueOf(element.getValue().get("value").intValue());
+		    		Integer transTypeNamespace = Integer.valueOf(element.getValue().get("ns").intValue());
+		    		
+		    		clazz = payloadMap.get(new AviatorTransactionType(transTypeNamespace, transTypeValue)); 
 		    	}
 		    	
 		    	if (name.equals("payload")) {

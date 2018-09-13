@@ -12,6 +12,8 @@ import java.util.Set;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
+import com.txmq.exo.messaging.AviatorTransactionType;
+
 /**
  * ExoTransactionRouter implements an annotation-based transaction routing 
  * scheme.  To implement, you annotate a transaction processing method with 
@@ -43,7 +45,7 @@ public abstract class ExoRouter<T extends Annotation> {
 	/**
 	 * Map of transaction type values to the methods that handle them.
 	 */
-	protected Map<Integer, Method> transactionMap;
+	protected Map<AviatorTransactionType, Method> transactionMap;
 
 	/**
 	 * Methods have to be invoked on an instance of an object (unless
@@ -69,10 +71,8 @@ public abstract class ExoRouter<T extends Annotation> {
 	 */
 	@SuppressWarnings("unchecked")
 	public ExoRouter() {
-		this.transactionMap = new HashMap<Integer, Method>();
+		this.transactionMap = new HashMap<AviatorTransactionType, Method>();
 		this.transactionProcessors = new HashMap<Class<?>, Object>(); 		
-		Type tmp = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		Class clazz = (Class) tmp;
 		this.annotationType = ((Class<? extends Annotation>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
 	}
 	
@@ -88,10 +88,15 @@ public abstract class ExoRouter<T extends Annotation> {
 		for (Method method : methods) {
 			@SuppressWarnings("unchecked")
 			T methodAnnotation = (T) method.getAnnotation(this.annotationType);
-			Method valueMethod;
+			Method valueMethod, namespaceMethod;
 			try {
+				namespaceMethod = this.annotationType.getMethod("namespace", (Class<?>[]) null);
 				valueMethod = this.annotationType.getMethod("value", (Class<?>[]) null);
-				this.transactionMap.put((Integer) valueMethod.invoke(methodAnnotation), method);
+				AviatorTransactionType transactionType = new AviatorTransactionType(
+					(String) namespaceMethod.invoke(methodAnnotation),
+					(String) valueMethod.invoke(methodAnnotation)
+				);
+				this.transactionMap.put(transactionType, method);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new IllegalArgumentException(
@@ -104,7 +109,7 @@ public abstract class ExoRouter<T extends Annotation> {
 		return this;
 	}
 	
-	protected Object invokeHandler(int key, Object... args) throws ReflectiveOperationException {
+	protected Object invokeHandler(AviatorTransactionType key, Object... args) throws ReflectiveOperationException {
 		if (this.transactionMap.containsKey(key)) {
 			Method method = this.transactionMap.get(key);
 			Class<?> processorClass = method.getDeclaringClass();			

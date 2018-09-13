@@ -7,10 +7,9 @@ import java.io.Serializable;
 import java.net.Socket;
 
 import com.swirlds.platform.Platform;
-import com.txmq.exo.messaging.ExoTransactionType;
 import com.txmq.exo.core.ExoPlatformLocator;
 import com.txmq.exo.core.ExoState;
-import com.txmq.exo.messaging.ExoMessage;
+import com.txmq.exo.messaging.AviatorCoreTransactionTypes;
 import com.txmq.exo.messaging.ExoMessage;
 
 /**
@@ -56,12 +55,12 @@ public class TransactionServerConnection extends Thread {
 					 * simply pass through to the platform for processing by the Hashgraph,
 					 * unless it's an ACKNOWLEDGE transaction.
 					 */
-					if (message.transactionType.getValue() == ExoTransactionType.ACKNOWLEDGE) {
+					if (message.transactionType.getValue() == AviatorCoreTransactionTypes.ACKNOWLEDGE) {
 						//We shouldn't receive this from the client.  If we do, just send it back
-						response.transactionType.setValue(ExoTransactionType.ACKNOWLEDGE);
+						response.transactionType.setValue(AviatorCoreTransactionTypes.ACKNOWLEDGE);
 					} else {	
 						ExoPlatformLocator.createTransaction(message);
-						response.transactionType.setValue(ExoTransactionType.ACKNOWLEDGE);
+						response.transactionType.setValue(AviatorCoreTransactionTypes.ACKNOWLEDGE);
 					}
 				} catch (ReflectiveOperationException e) {
 					// TODO Auto-generated catch block

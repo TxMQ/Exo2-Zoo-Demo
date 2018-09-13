@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,9 @@ import com.swirlds.platform.Platform;
 import com.swirlds.platform.SwirldState;
 import com.txmq.exo.config.ExoConfig;
 import com.txmq.exo.config.MessagingConfig;
+import com.txmq.exo.messaging.AviatorTransactionType;
+import com.txmq.exo.messaging.AviatorCoreTransactionTypes;
 import com.txmq.exo.messaging.ExoMessage;
-import com.txmq.exo.messaging.ExoTransactionType;
 import com.txmq.exo.messaging.rest.CORSFilter;
 import com.txmq.exo.messaging.socket.TransactionServer;
 import com.txmq.exo.messaging.websocket.grizzly.ExoWebSocketApplication;
@@ -144,14 +144,11 @@ public class ExoPlatformLocator {
 	 * @throws ClassNotFoundException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static synchronized void initFromConfig(Platform platform) {
-		//TEST
-		System.out.println(((ExoState) platform.getState()).getMyName());
-		Address a = platform.getAddress();
-		//TEST
+	public static synchronized void initFromConfig(Platform platform) throws ReflectiveOperationException {
 		ExoPlatformLocator.platform = platform;
 		ExoConfig config = ExoConfig.getConfig();
 		
+		/*
 		//Initialize transaction types
 		Class<? extends ExoTransactionType> transactionTypeClass;
 		try {
@@ -162,8 +159,9 @@ public class ExoPlatformLocator {
 				"Error instantiating transaction types enumerator: " + config.hashgraphConfig.transactionTypesClassName
 			);
 		}
+*/
 		
-		init(platform, transactionTypeClass, config.hashgraphConfig.transactionProcessors);
+		init(platform, config.hashgraphConfig.transactionProcessors);
 		
 		//Set up socket messaging, if it's in the config..
 		MessagingConfig messagingConfig = null; 
@@ -284,7 +282,7 @@ public class ExoPlatformLocator {
 	 * @param path
 	 * @throws ClassNotFoundException 
 	 */
-	public static synchronized void initFromConfig(Platform platform, String path) {
+	public static synchronized void initFromConfig(Platform platform, String path) throws ReflectiveOperationException {
 		ExoConfig.loadConfiguration(path);
 		initFromConfig(platform);
 	}
@@ -292,34 +290,29 @@ public class ExoPlatformLocator {
 	/**
 	 * Initialization method for the platform.  This should be called by your main's 
 	 * init() or run() methods
+	 * @throws IllegalAccessException 
+	 * @throws ReflectiveOperationException 
 	 */
-	public static synchronized void init(Platform platform) {
+	public static synchronized void init(Platform platform) throws ReflectiveOperationException {
 		ExoPlatformLocator.platform = platform;
-		
+		AviatorTransactionType.initialize();			
 	}
 	
 	public static synchronized void init(	Platform platform, 
-											Class<? extends ExoTransactionType> transactionTypeClass, 
-											String[] transactionProcessorPackages) {
+											String[] transactionProcessorPackages)
+		throws ReflectiveOperationException
+	{
 		init(platform);
-		
-		//Hokey, but we cause the transaction type class to initialize itself by simply instantiating one..
-		try {
-			transactionTypeClass.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		initPipelineRouter(transactionProcessorPackages);
 	}
 	
 	
 	public static synchronized void init(	Platform platform, 
-							Class<? extends ExoTransactionType> transactionTypeClass,
 							String[] transactionProcessorPackages, 
-							IBlockLogger logger) {
-		init(platform, transactionTypeClass, transactionProcessorPackages);
+							IBlockLogger logger) 
+		throws ReflectiveOperationException
+	{
+		init(platform, transactionProcessorPackages);
 		blockLogger.setLogger(logger,  platform.getAddress().getSelfName());
 	}	
 	
@@ -424,12 +417,8 @@ public class ExoPlatformLocator {
 			} else {
 				
 			}
-			createTransaction(
-				new ExoMessage<Serializable>(
-					new ExoTransactionType(ExoTransactionType.ANNOUNCE_NODE),
-					externalUrl
-				)
-			);
+			//Port ExoCoreTransactionTypes to public static Strings
+			createTransaction(new ExoMessage<Serializable>(AviatorCoreTransactionTypes.class.getName(), AviatorCoreTransactionTypes.ANNOUNCE_NODE, externalUrl));
 					
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block

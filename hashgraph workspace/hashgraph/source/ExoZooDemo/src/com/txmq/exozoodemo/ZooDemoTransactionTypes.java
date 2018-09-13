@@ -1,29 +1,15 @@
 package com.txmq.exozoodemo;
 
-import com.txmq.exo.messaging.ExoTransactionType;
+import com.txmq.exo.messaging.annotations.TransactionType;
+import com.txmq.exo.messaging.annotations.TransactionTypes;
 
-public class ZooDemoTransactionTypes extends ExoTransactionType {
-	public static final int GET_ZOO = 1;
-	public static final int ADD_ANIMAL = 2;
+@TransactionTypes(namespace=ZooDemoTransactionTypes.NAMESPACE, onlyAnnotatedValues=true)
+public class ZooDemoTransactionTypes {
+	public static final String NAMESPACE = "ZooDemoTransactionTypes";
 	
-	private static final int[] values = {
-			GET_ZOO,
-			ADD_ANIMAL
-	};
+	@TransactionType
+	public static final String GET_ZOO = "GET_ZOO";
 	
-	public ZooDemoTransactionTypes() {
-		super();
-		if (getInitialized() == false) {
-			initialize(values);
-		}
-	}
-	
-	public ZooDemoTransactionTypes(int transactionType) {
-		super();
-		if (getInitialized() == false) {
-			initialize(values);
-		}
-		
-		this.setValue(transactionType);
-	}
+	@TransactionType
+	public static final String ADD_ANIMAL = "ADD_ANIMAL";	
 }

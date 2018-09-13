@@ -59,7 +59,12 @@ public class ExoZooDemoMain implements SwirldMain {
 		platform.setAbout("Hello Swirld v. 1.0\n"); // set the browser's "about" box
 		platform.setSleepAfterSync(sleepPeriod);
 
-		ExoPlatformLocator.initFromConfig(platform);
+		try {
+			ExoPlatformLocator.initFromConfig(platform);
+		} catch (ReflectiveOperationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		/*
 		//Initialize the platform locator, so Exo code can get a reference to the platform when needed.

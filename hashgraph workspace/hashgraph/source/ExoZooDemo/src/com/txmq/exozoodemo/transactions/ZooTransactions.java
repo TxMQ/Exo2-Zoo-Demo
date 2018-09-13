@@ -11,7 +11,8 @@ import io.swagger.model.Zoo;
 
 public class ZooTransactions {
 
-	@ExoHandler(transactionType=ZooDemoTransactionTypes.ADD_ANIMAL, 
+	@ExoHandler(namespace=ZooDemoTransactionTypes.NAMESPACE, 
+				transactionType=ZooDemoTransactionTypes.ADD_ANIMAL, 
 				events={PlatformEvents.executePreConsensus, PlatformEvents.executeConsensus},
 				payloadClass=Animal.class)
 	public void addAnimal(ExoMessage<Animal> message, SocketDemoState state) {
@@ -30,7 +31,8 @@ public class ZooTransactions {
 		}						
 	}
 	
-	@ExoHandler(transactionType=ZooDemoTransactionTypes.GET_ZOO, 
+	@ExoHandler(namespace=ZooDemoTransactionTypes.NAMESPACE,
+				transactionType=ZooDemoTransactionTypes.GET_ZOO, 
 				events={PlatformEvents.messageReceived})
 	public Zoo getZoo(ExoMessage<?> message, SocketDemoState state) {
 		Zoo zoo = new Zoo();

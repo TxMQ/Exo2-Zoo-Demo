@@ -17,7 +17,8 @@ import com.txmq.exozoodemo.ZooDemoTransactionTypes;
  */
 public class ZooWebSocketSubscriber extends ExoWebSocketSubscriber {
 
-	@ExoSubscriber(	transactionType=ZooDemoTransactionTypes.ADD_ANIMAL, 
+	@ExoSubscriber(	namespace=ZooDemoTransactionTypes.NAMESPACE,
+					transactionType=ZooDemoTransactionTypes.ADD_ANIMAL, 
 					events= {	ReportingEvents.submitted, 
 								ReportingEvents.preConsensusResult, 
 								ReportingEvents.consensusResult, 
@@ -28,7 +29,9 @@ public class ZooWebSocketSubscriber extends ExoWebSocketSubscriber {
 		this.sendNotification(notification);
 	}
 	
-	@ExoSubscriber(	transactionType=ZooDemoTransactionTypes.GET_ZOO, events={ReportingEvents.transactionComplete})
+	@ExoSubscriber(	namespace=ZooDemoTransactionTypes.NAMESPACE,
+					transactionType=ZooDemoTransactionTypes.GET_ZOO, 
+					events={ReportingEvents.transactionComplete})
 	public void getZooTransactionProgress(ExoNotification<?> notification) {
 		String myName = ExoPlatformLocator.getState().getMyName();
 		System.out.println("Sending notification from " + myName);

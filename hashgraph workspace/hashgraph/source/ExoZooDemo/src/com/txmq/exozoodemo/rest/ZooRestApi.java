@@ -12,6 +12,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.txmq.exo.messaging.AviatorTransactionType;
 import com.txmq.exo.messaging.ExoMessage;
 import com.txmq.exo.pipeline.ReportingEvents;
 import com.txmq.exo.pipeline.subscribers.ExoSubscriberManager;
@@ -28,7 +29,7 @@ public class ZooRestApi {
 	@Produces(MediaType.APPLICATION_JSON)
 	public void getZoo(@Suspended final AsyncResponse response) {
 		ExoMessage<Serializable> message = new ExoMessage<Serializable>(
-				new ZooDemoTransactionTypes(ZooDemoTransactionTypes.GET_ZOO),
+				new AviatorTransactionType(ZooDemoTransactionTypes.NAMESPACE, ZooDemoTransactionTypes.GET_ZOO),
 				null
 		);
 		
@@ -44,7 +45,10 @@ public class ZooRestApi {
 	@Path("/zoo/animals")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void addAnimal(Animal animal, @Suspended final AsyncResponse response) {
-		ExoMessage<Animal> message = new ExoMessage<Animal>(new ZooDemoTransactionTypes(ZooDemoTransactionTypes.ADD_ANIMAL), animal);
+		ExoMessage<Animal> message = new ExoMessage<Animal>(
+				new AviatorTransactionType(ZooDemoTransactionTypes.NAMESPACE, ZooDemoTransactionTypes.ADD_ANIMAL), 
+				animal
+		);
 		this.subscriberManager.registerResponder(message, ReportingEvents.transactionComplete, response);
 		try {
 			message.submit();

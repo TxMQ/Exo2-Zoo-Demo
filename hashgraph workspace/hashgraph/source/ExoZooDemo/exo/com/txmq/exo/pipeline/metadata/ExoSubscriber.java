@@ -24,6 +24,7 @@ import com.txmq.exo.pipeline.ReportingEvents;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ExoSubscriber {
-	int transactionType();
+	String namespace();
+	String transactionType();
 	ReportingEvents[] events();
 }

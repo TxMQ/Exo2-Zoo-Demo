@@ -2,15 +2,13 @@ package com.txmq.exo.pipeline.routers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.txmq.exo.core.ExoPlatformLocator;
 import com.txmq.exo.core.ExoState;
+import com.txmq.exo.messaging.AviatorTransactionType;
 import com.txmq.exo.messaging.ExoMessage;
 import com.txmq.exo.messaging.ExoNotification;
-import com.txmq.exo.messaging.ExoTransactionType;
 import com.txmq.exo.pipeline.PipelineStatus;
 import com.txmq.exo.pipeline.PlatformEvents;
 import com.txmq.exo.pipeline.ReportingEvents;
@@ -89,7 +87,7 @@ public class ExoPipelineRouter {
 		}		
 	}
 	
-	public List<ReportingEvents> getRegisteredNotificationsForTransactionType(ExoTransactionType transactionType) {
+	public List<ReportingEvents> getRegisteredNotificationsForTransactionType(AviatorTransactionType transactionType) {
 		List<ReportingEvents> registeredEvents = new ArrayList<ReportingEvents>();
 		
 		if (this.submittedRouter.hasRouteForTransactionType(transactionType)) {

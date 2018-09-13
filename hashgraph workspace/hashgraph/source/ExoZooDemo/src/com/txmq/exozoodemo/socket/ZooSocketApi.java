@@ -11,7 +11,7 @@ import io.swagger.model.Zoo;
 
 public class ZooSocketApi {
 
-	@ExoMessageHandler(ZooDemoTransactionTypes.GET_ZOO)
+	@ExoMessageHandler(namespace=ZooDemoTransactionTypes.NAMESPACE, transactionType=ZooDemoTransactionTypes.GET_ZOO)
 	public Serializable getZoo(ExoMessage<?> message, SocketDemoState state) {
 		Zoo result = new Zoo();
 		result.lions(state.getLions());

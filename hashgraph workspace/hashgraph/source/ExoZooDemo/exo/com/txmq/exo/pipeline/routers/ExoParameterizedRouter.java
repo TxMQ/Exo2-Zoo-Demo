@@ -15,8 +15,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
 import com.txmq.exo.core.ExoState;
+import com.txmq.exo.messaging.AviatorTransactionType;
 import com.txmq.exo.messaging.ExoMessage;
-import com.txmq.exo.messaging.ExoTransactionType;
 import com.txmq.exo.messaging.websocket.grizzly.ExoMessageJsonParser;
 import com.txmq.exo.pipeline.metadata.ExoNullPayloadType;
 
@@ -55,7 +55,7 @@ public class ExoParameterizedRouter<E extends Enum<E>> {
 	/**
 	 * Map of transaction type values to the methods that handle them.
 	 */
-	protected Map<Integer, List<Method>> transactionMap;
+	protected Map<AviatorTransactionType, List<Method>> transactionMap;
 
 	/**
 	 * Methods have to be invoked on an instance of an object (unless
@@ -79,7 +79,7 @@ public class ExoParameterizedRouter<E extends Enum<E>> {
 	 * @see com.txmq.exo.core.ExoPlatformLocator
 	 */
 	public ExoParameterizedRouter(Class<? extends Annotation> annotationType, E event) {
-		this.transactionMap = new HashMap<Integer, List<Method>>();
+		this.transactionMap = new HashMap<AviatorTransactionType, List<Method>>();
 		this.transactionProcessors = new HashMap<Class<?>, Object>(); 		
 		this.annotationType = annotationType;
 		this.event = event;		
@@ -104,11 +104,13 @@ public class ExoParameterizedRouter<E extends Enum<E>> {
 				Annotation[] methodAnnotations = method.getAnnotationsByType(this.annotationType);
 				
 				for (Annotation methodAnnotation : methodAnnotations) {
+					Method namespaceMethod;
 					Method transactionTypeMethod;
 					Method eventTypesMethod;
 					Method payloadTypeMethod;
 					
 					try {
+						namespaceMethod = methodAnnotation.getClass().getMethod("namespace");
 						transactionTypeMethod = methodAnnotation.getClass().getMethod("transactionType");
 						eventTypesMethod = methodAnnotation.getClass().getMethod("events");
 						payloadTypeMethod = null;
@@ -124,7 +126,9 @@ public class ExoParameterizedRouter<E extends Enum<E>> {
 							//Add a mapping from this transaction type to its processor 
 							//if the event matches the event this instance tracks.  
 							if (eventType.equals(this.event)) {
-								Integer transactionType = (Integer) transactionTypeMethod.invoke(methodAnnotation);
+								String namespace = (String) namespaceMethod.invoke(methodAnnotation);
+								String transactionTypeValue = (String) transactionTypeMethod.invoke(methodAnnotation);
+								AviatorTransactionType transactionType = new AviatorTransactionType(namespace, transactionTypeValue);
 								if (!this.transactionMap.containsKey(transactionType)) {
 									this.transactionMap.put(transactionType, new ArrayList<Method>());
 								}
@@ -156,14 +160,14 @@ public class ExoParameterizedRouter<E extends Enum<E>> {
 	}
 	
 	public Serializable routeTransaction(ExoMessage<?> message, ExoState state) throws ReflectiveOperationException {
-		return this.invokeHandler(message.transactionType.getValue(), message, state);
+		return this.invokeHandler(message.transactionType, message, state);
 	}
 	
-	public boolean hasRouteForTransactionType(ExoTransactionType transactionType) {
-		return this.transactionMap.containsKey(transactionType.getValue());
+	public boolean hasRouteForTransactionType(AviatorTransactionType transactionType) {
+		return this.transactionMap.containsKey(transactionType);
 	}
 	
-	protected Serializable invokeHandler(int key, Object... args) throws ReflectiveOperationException {
+	protected Serializable invokeHandler(AviatorTransactionType key, Object... args) throws ReflectiveOperationException {
 		Serializable result = null;;
 		if (this.transactionMap.containsKey(key)) {
 			List<Method> methods = this.transactionMap.get(key); 

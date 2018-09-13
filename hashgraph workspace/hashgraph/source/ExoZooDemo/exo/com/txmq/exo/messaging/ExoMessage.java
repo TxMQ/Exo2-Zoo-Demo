@@ -8,8 +8,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.txmq.exo.core.ExoPlatformLocator;
 
 /**
@@ -38,7 +36,7 @@ public class ExoMessage<T extends Serializable> implements Serializable {
 	/**
 	 * The type of transaction this represents
 	 */
-	public ExoTransactionType transactionType;
+	public AviatorTransactionType transactionType;
 
 	/**
 	 * The business data associated with this transaction.  
@@ -81,7 +79,6 @@ public class ExoMessage<T extends Serializable> implements Serializable {
 	
 	public ExoMessage() {
 		super();
-		this.transactionType = new ExoTransactionType();
 		this.uuid = UUID.randomUUID();
 	}
 	
@@ -89,7 +86,7 @@ public class ExoMessage<T extends Serializable> implements Serializable {
 	 * Initialize this message with the supplied transaction type.
 	 * @param transactionType
 	 */
-	public ExoMessage(ExoTransactionType transactionType) {
+	public ExoMessage(AviatorTransactionType transactionType) {
 		super();
 		this.transactionType = transactionType;	
 		this.uuid = UUID.randomUUID();
@@ -99,12 +96,28 @@ public class ExoMessage<T extends Serializable> implements Serializable {
 	 * Initialize this message with the supplied transaction type and payload.
 	 * @param transactionType
 	 */
-	public ExoMessage(ExoTransactionType transactionType, T payload) {
+	public ExoMessage(AviatorTransactionType transactionType, T payload) {
 		super();
 		this.transactionType = transactionType;				
 		this.payload = payload;
 		this.uuid = UUID.randomUUID();
 	}
+	
+	/**
+	 * Initialize this message with the supplied transaction type.
+	 * @param transactionType
+	 */
+//	public ExoMessage(String namespace, String transactionType) {
+//		this(new AviatorTransactionType(namespace, transactionType));		
+//	}
+	
+	/**
+	 * Initialize this message with the supplied transaction type and payload.
+	 * @param transactionType
+	 */
+	public ExoMessage(String namespace, String transactionType, T payload) {
+		this(new AviatorTransactionType(namespace, transactionType), payload);
+	}	
 	
 	/**
 	 * Serialize this transaction to a sequence of bytes

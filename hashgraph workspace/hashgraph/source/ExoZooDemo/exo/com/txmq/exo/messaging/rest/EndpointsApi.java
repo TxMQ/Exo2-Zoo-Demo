@@ -10,8 +10,9 @@ import javax.ws.rs.core.Response;
 
 import com.txmq.exo.core.ExoPlatformLocator;
 import com.txmq.exo.core.ExoState;
+import com.txmq.exo.messaging.AviatorTransactionType;
+import com.txmq.exo.messaging.AviatorCoreTransactionTypes;
 import com.txmq.exo.messaging.ExoMessage;
-import com.txmq.exo.messaging.ExoTransactionType;
 
 /**
  * This class implements a REST endpoint for retrieving a list of endpoints that the Swirld
@@ -33,7 +34,9 @@ public class EndpointsApi {
 	public Response shutdown() {
 		
 		ExoMessage<Serializable> transaction = 
-				new ExoMessage<Serializable>(new ExoTransactionType(ExoTransactionType.SHUTDOWN));
+				new ExoMessage<Serializable>(
+						new AviatorTransactionType(AviatorCoreTransactionTypes.class.getName(), AviatorCoreTransactionTypes.SHUTDOWN)
+		);
 		try {
 			ExoPlatformLocator.createTransaction(transaction);
 		} catch (Exception e) {
