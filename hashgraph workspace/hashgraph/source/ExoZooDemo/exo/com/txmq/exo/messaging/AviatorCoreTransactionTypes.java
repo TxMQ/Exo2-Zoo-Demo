@@ -13,6 +13,9 @@ public class AviatorCoreTransactionTypes {
 	public static final String ANNOUNCE_NODE = "ANNOUNCE_NODE";
 	
 	@TransactionType
+	public static final String LIST_ENDPOINTS = "LIST_ENDPOINTS";
+	
+	@TransactionType
 	public static final String RECOVER_STATE = "RECOVER_STATE";
 	
 	@TransactionType
