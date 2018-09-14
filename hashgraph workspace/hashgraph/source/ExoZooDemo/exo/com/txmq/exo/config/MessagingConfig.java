@@ -1,6 +1,6 @@
 package com.txmq.exo.config;
 
-public class MessagingConfig {
+public class MessagingConfig implements IConfiguration {
 	public Integer port;
 	public Integer derivedPort;
 	public boolean secured;
