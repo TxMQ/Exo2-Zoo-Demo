@@ -75,8 +75,8 @@ public class ExoMessageJsonParser extends ObjectMapper {
 		    	String name = element.getKey();
 		    	if (name.equals("transactionType")) {
 		    		AviatorTransactionType transactionType = new AviatorTransactionType();
-		    		if (element.getValue().get("ns").isNumber()) {
-		    			transactionType.setNamespace(element.getValue().get("ns").intValue());
+		    		if (element.getValue().get("ns").asInt() != 0) {
+		    			transactionType.setNamespace(element.getValue().get("ns").asInt());
 		    		} else {
 		    			//most likely we received a string instead of an integer..  Let's try that.
 		    			//Let things explode if it's neither a string or an integer.
@@ -84,8 +84,8 @@ public class ExoMessageJsonParser extends ObjectMapper {
 		    			((ObjectNode) element.getValue()).put("ns",  transactionType.getNamespaceHash());
 		    		}
 		    		
-		    		if (element.getValue().get("value").isNumber()) {
-		    			transactionType.setValue(element.getValue().get("value").intValue());
+		    		if (element.getValue().get("value").asInt() != 0) {
+		    			transactionType.setValue(element.getValue().get("value").asInt());
 		    		} else {
 		    			//most likely we received a string instead of an integer..  Let's try that.
 		    			//Let things explode if it's neither a string or an integer.

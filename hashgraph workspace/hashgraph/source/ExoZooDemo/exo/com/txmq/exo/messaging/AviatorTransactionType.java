@@ -108,7 +108,7 @@ public class AviatorTransactionType implements Serializable {
 		for (AviatorTransactionType transactionType : transactionTypes) {
 			NamespaceEntry nsEntry = result.get(transactionType.getNamespaceHash());
 			nsEntry.transactionTypes.put(transactionType.getValueHash(), transactionType.getValue());
-			result.get(transactionType.getNamespaceHash()).transactionTypes.put(transactionType.getValueHash(), transactionType.getValue());
+			//result.get(transactionType.getNamespaceHash()).transactionTypes.put(transactionType.getValueHash(), transactionType.getValue());
 		}
 		
 		return result;
@@ -186,7 +186,7 @@ public class AviatorTransactionType implements Serializable {
 	}
 	
 	public String getValue() {
-		return namespaceHashes.getKey(this.value);
+		return transactionTypeHashes.getKey(this.value);
 	}
 	
 	public AviatorTransactionType() {

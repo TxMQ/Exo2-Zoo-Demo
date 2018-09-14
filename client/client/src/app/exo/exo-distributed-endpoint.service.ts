@@ -35,6 +35,8 @@ export class ExoDistributedEndpointService {
    */
   private configuration:ExoConfig;
 
+  //TODO:  This is just hacked in..
+  public endpointsReady: Subject<boolean> = new Subject<boolean>();
   /**
    * Constructor
    * @param  {HttpClient} privatehttpClient
@@ -59,7 +61,6 @@ export class ExoDistributedEndpointService {
   public init(configuration:ExoConfig):Subject<boolean> {
     this.configuration = configuration;
 
-    let endpointsReady:Subject<boolean> = new Subject<boolean>();
     this.endpoints = configuration.defaultNodes.map(endpoint => endpoint);
     
     //Fetch an updated list of nodes from one of the known-good nodes in the config.
@@ -71,13 +72,13 @@ export class ExoDistributedEndpointService {
       .subscribe( 
         result => { 
           this.endpoints = result as Array<string>; 
-          endpointsReady.next(true);
+          this.endpointsReady.next(true);
         },
         error => {
-          endpointsReady.next(true);
+          this.endpointsReady.next(true);
         }
       );
-    return endpointsReady;
+    return this.endpointsReady;
   }
 
   //TODO:  Modularize URL strategy

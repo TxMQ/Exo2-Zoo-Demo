@@ -15,6 +15,7 @@ import { ZooWebsocketService } from './zoo-websocket.service';
 import { MatDialogModule } from '@angular/material';
 import { WebSocketMessageDialogComponent } from './web-socket-message-dialog/web-socket-message-dialog.component';
 import { PrettyJsonModule } from 'angular2-prettyjson';
+import { TransactionTypesMapServiceService } from './transaction-types-map-service.service';
 
 const appRoutes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -60,7 +61,7 @@ const exoConfig:ExoConfig = {
     PrettyJsonModule,
     ExoModule.forRoot(exoConfig)
   ],
-  providers: [DefaultService, ZooWebsocketService],
+  providers: [DefaultService, ZooWebsocketService, TransactionTypesMapServiceService],
   bootstrap: [AppComponent],
   entryComponents: [WebSocketMessageDialogComponent]
 })
