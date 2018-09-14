@@ -1,21 +1,26 @@
 package com.txmq.exo.messaging;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.reflections.Reflections;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.txmq.exo.messaging.annotations.TransactionType;
 import com.txmq.exo.messaging.annotations.TransactionTypes;
 
 import util.hash.MurmurHash3;
 
-public class AviatorTransactionType {
+public class AviatorTransactionType implements Serializable {
 
 	/**
 	 * Seed value for the hashing algorithm used internally. This value 
@@ -68,9 +73,8 @@ public class AviatorTransactionType {
 		Set<Class<?>> transactionTypeClasses = reflections.getTypesAnnotatedWith(TransactionTypes.class);
 		for (Class<?> ttc : transactionTypeClasses) {
 			TransactionTypes tta = ttc.getAnnotation(TransactionTypes.class);
-System.out.println(ttc.getName());
 			String namespace;
-			if (tta.namespace().equals("")) {
+			if (!tta.namespace().equals("")) {
 				namespace = tta.namespace();
 			} else {
 				namespace = ttc.getName();
@@ -87,9 +91,41 @@ System.out.println(ttc.getName());
 					String typeValue = (String) field.get(null);
 					int typeHash = hash(typeValue);
 					transactionTypeHashes.putIfAbsent(typeValue, typeHash);
-					transactionTypes.add(new AviatorTransactionType(ttc.getName(), typeValue));
+					transactionTypes.add(new AviatorTransactionType(namespace, typeValue));
 				}
 			}
+		}
+	}
+	
+	public static Map<Integer, NamespaceEntry> getTransactionTypesMap() {
+		
+		HashMap<Integer, NamespaceEntry> result = new HashMap<Integer, NamespaceEntry>();
+		for (Integer nsHash : namespaceHashes.values()) {
+			NamespaceEntry nsEntry = new AviatorTransactionType().new NamespaceEntry(nsHash, namespaceHashes.getKey(nsHash));
+			result.put(nsHash, nsEntry);
+		}
+		
+		for (AviatorTransactionType transactionType : transactionTypes) {
+			NamespaceEntry nsEntry = result.get(transactionType.getNamespaceHash());
+			nsEntry.transactionTypes.put(transactionType.getValueHash(), transactionType.getValue());
+			result.get(transactionType.getNamespaceHash()).transactionTypes.put(transactionType.getValueHash(), transactionType.getValue());
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Inner class used in the transaction type map
+	 */
+	public class NamespaceEntry {
+		public Integer namesapceHash;
+		public String namespace;
+		public Map<Integer, String> transactionTypes;		
+		
+		public NamespaceEntry(int hash, String namespace) {
+			this.namesapceHash = hash;
+			this.namespace = namespace;
+			this.transactionTypes = new HashMap<Integer, String>();
 		}
 	}
 	
@@ -107,7 +143,14 @@ System.out.println(ttc.getName());
 	 */
 	private int value;
 	
+	@JsonIgnore()
+	private String _ns;
+	
+	@JsonIgnore() 
+	private String _value;
+	
 	//TODO:  Test for validity
+	@JsonProperty("ns")
 	public void setNamespace(int namespace) {
 		this.ns = namespace;
 	}
@@ -115,6 +158,7 @@ System.out.println(ttc.getName());
 	//TODO: test for validity
 	public void setNamespace(String namespace) {
 		this.ns = hash(namespace);
+		this._ns = namespace;
 	}
 	
 	@JsonProperty("ns")
@@ -122,6 +166,7 @@ System.out.println(ttc.getName());
 		return this.ns;
 	}
 	
+	@JsonIgnore
 	public String getNamespace() {
 		return namespaceHashes.getKey(this.ns);		
 	}
@@ -132,6 +177,7 @@ System.out.println(ttc.getName());
 	
 	public void setValue(String value) {
 		this.value = hash(value);
+		this._value = value;
 	}
 	
 	@JsonProperty("value")
@@ -141,6 +187,10 @@ System.out.println(ttc.getName());
 	
 	public String getValue() {
 		return namespaceHashes.getKey(this.value);
+	}
+	
+	public AviatorTransactionType() {
+		super();
 	}
 	
 	public AviatorTransactionType(String namespace, String value) {
@@ -153,6 +203,7 @@ System.out.println(ttc.getName());
 		this.setValue(value);
 	}
 	
+	@JsonIgnore
 	public boolean isValid() {
 		return transactionTypes.contains(this);
 	}
@@ -161,5 +212,10 @@ System.out.println(ttc.getName());
 	public boolean equals(Object obj) {
 		AviatorTransactionType that = (AviatorTransactionType) obj;
 		return this.ns == that.ns && this.value == that.value;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.ns, this.value);
 	}
 }

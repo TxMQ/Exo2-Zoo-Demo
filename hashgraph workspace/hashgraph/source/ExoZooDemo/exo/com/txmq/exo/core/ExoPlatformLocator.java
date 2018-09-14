@@ -418,7 +418,7 @@ public class ExoPlatformLocator {
 				
 			}
 			//Port ExoCoreTransactionTypes to public static Strings
-			createTransaction(new ExoMessage<Serializable>(AviatorCoreTransactionTypes.class.getName(), AviatorCoreTransactionTypes.ANNOUNCE_NODE, externalUrl));
+			createTransaction(new ExoMessage<Serializable>(AviatorCoreTransactionTypes.NAMESPACE, AviatorCoreTransactionTypes.ANNOUNCE_NODE, externalUrl));
 					
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block

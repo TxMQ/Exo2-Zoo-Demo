@@ -74,10 +74,26 @@ public class ExoMessageJsonParser extends ObjectMapper {
 		    	Entry<String, JsonNode> element = elementsIterator.next();  
 		    	String name = element.getKey();
 		    	if (name.equals("transactionType")) {
-		    		Integer transTypeValue = Integer.valueOf(element.getValue().get("value").intValue());
-		    		Integer transTypeNamespace = Integer.valueOf(element.getValue().get("ns").intValue());
+		    		AviatorTransactionType transactionType = new AviatorTransactionType();
+		    		if (element.getValue().get("ns").isNumber()) {
+		    			transactionType.setNamespace(element.getValue().get("ns").intValue());
+		    		} else {
+		    			//most likely we received a string instead of an integer..  Let's try that.
+		    			//Let things explode if it's neither a string or an integer.
+		    			transactionType.setNamespace(element.getValue().get("ns").textValue());
+		    			((ObjectNode) element.getValue()).put("ns",  transactionType.getNamespaceHash());
+		    		}
 		    		
-		    		clazz = payloadMap.get(new AviatorTransactionType(transTypeNamespace, transTypeValue)); 
+		    		if (element.getValue().get("value").isNumber()) {
+		    			transactionType.setValue(element.getValue().get("value").intValue());
+		    		} else {
+		    			//most likely we received a string instead of an integer..  Let's try that.
+		    			//Let things explode if it's neither a string or an integer.
+		    			transactionType.setValue(element.getValue().get("value").textValue());
+		    			((ObjectNode) element.getValue()).put("value",  transactionType.getValueHash());
+		    		}
+		    		
+		    		clazz = payloadMap.get(transactionType); 
 		    	}
 		    	
 		    	if (name.equals("payload")) {
@@ -86,6 +102,7 @@ public class ExoMessageJsonParser extends ObjectMapper {
 		    	}
 		    }
 		    
+		    //TODO:  THis implementation is incomplete..  The innerMapper needs to account for string/integer values in the namespace
 		    @SuppressWarnings("unchecked")
 			ExoMessage<Serializable> result = innerMapper.treeToValue(obj, ExoMessage.class);
 		    if (clazz != null) {

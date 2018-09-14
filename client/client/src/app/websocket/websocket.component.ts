@@ -74,7 +74,8 @@ export class WebsocketComponent implements OnInit, OnDestroy {
 
     const getZooRequest = {
       transactionType: {
-        value: 1
+        ns: -1462768670,
+        value: -662756982
       },
       payload: null,
       uuid: Guid.raw()
@@ -91,7 +92,8 @@ export class WebsocketComponent implements OnInit, OnDestroy {
   public addAnimal() {
     const addAnimalRequest = {
       transactionType: {
-        value: 2
+        ns: 'ZooDemoTransactionTypes',
+        value: 'ADD_ANIMAL'
       },
       payload: {
         name: this.animalName,

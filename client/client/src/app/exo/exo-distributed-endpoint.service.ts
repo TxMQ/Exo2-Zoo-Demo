@@ -67,7 +67,7 @@ export class ExoDistributedEndpointService {
     //TODO:  Iterate through the default nodes looking for 
     //one that's up.  If one fails, move on to the next.
     this.httpClient
-      .get(this.endpoints[0] + configuration.apiPath + configuration.endpointsServicePath)
+      .get(this.endpoints[0] + configuration.endpointsServicePath)
       .subscribe( 
         result => { 
           this.endpoints = result as Array<string>; 
