@@ -1,4 +1,4 @@
-Hashgraph-Web Application Communication
+Aviator Core Framework Demo:  Aviator Zoo
 ================================
 
 This project contains a demonstration of a web application communicating with a Swirld.  The application tracks lions, tigers, and bears in a zoo.  Users can add animals to the zoo and see the updated state.  The zoo state is tracked in a Swirld, and adding an animal executes a transaction on the Swirld.  The demo supports two methods of communication:
@@ -25,6 +25,8 @@ If you change to "Use JAX-RS REST API" using the radio buttons at the top of the
 
 How the JAX-RS/Hashgraph Integration Works
 ------------------------------------------
+
+**The JAX-RS integration is currently under construction**
 
 Walking through the Swirld itself is outside the scope of what I'm trying to demonstrate, so if you're not familiar with how a Swirld works, please head over to swirlds.com and download the SDK and read the docs.
 
@@ -59,7 +61,6 @@ You are welcome to reuse/modify this code pursuant to the terms of the license f
 
 No warranty or support is expressed or implied, use at your own risk.
 
-Here's the catch:  I don't know what's coming in the near term from Swirlds.  The public SDK only runs through the Swirlds browser, which I imagine will be changed at some point.  I don't know whether or not Swirlds has a connectivity paradigm in the works, or when it would arrive.  This demonstration could certainly be developed into a framework for enabling communication between Swirlds and other Java or Javascript applications.  The point is, I don't know how much development this is going to see, because it could all be obsolete tomorrow.  Having said that, I'm willing to look at suggestions and pull requests if someone wants to contribute to this code.
 
 Licensing
 ---------
